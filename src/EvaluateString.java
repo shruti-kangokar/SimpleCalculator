@@ -1,12 +1,12 @@
 import java.util.Stack;
-
+ 
 public class EvaluateString
 {
     public static double evaluate(String expression)
     {
 
         char[] tokens = expression.toCharArray();
- 
+        
          // Stack for numbers: 'values'
         Stack<Double> values = new Stack<Double>();
  
@@ -15,7 +15,6 @@ public class EvaluateString
  
         for (int i = 0; i < tokens.length; i++)
         {
-        	
              // Current token is a whitespace, skip it
             if (tokens[i] == ' ')
             {
@@ -23,12 +22,11 @@ public class EvaluateString
             }
             
             // Current token is a number, push it to stack for numbers
-            if (tokens[i] >= '0' && tokens[i] <= '9')
+            if ((tokens[i] >= '0' && tokens[i] <= '9') || (tokens[i] == '.'))
             {
-            	
                 StringBuffer sbuf = new StringBuffer();
                 // There may be more than one digits in number
-                while (i < tokens.length && tokens[i] >= '0' && tokens[i] <= '9')
+                while (i < tokens.length && ((tokens[i] >= '0' && tokens[i] <= '9')||  (tokens[i] == '.')))
                 {
                     sbuf.append(tokens[i++]);
                 }
@@ -54,14 +52,21 @@ public class EvaluateString
                      tokens[i] == '*' || tokens[i] == '/' ||
                      tokens[i] == 's' || tokens[i] == 'S' ||
                      tokens[i] == 'c' || tokens[i] == 'C' ||
-                     tokens[i] == 't' || tokens[i] == 'T' )
+                     tokens[i] == 't' || tokens[i] == 'T' ||
+                     tokens[i] == 'n'|| tokens[i] == 'd' ||
+                     tokens[i] == 'e' || tokens[i] == 'f' ||
+                     tokens[i] == 'g' || tokens[i] == 'h' ||
+                     tokens[i] == 'i' || tokens[i] == 'j' ||
+                     tokens[i] == 'k' || tokens[i] == 'l' ||
+                     tokens[i] == 'm' )
             {
                 // While top of 'ops' has same or greater precedence to current
                 // token, which is an operator. Apply operator on top of 'ops'
                 // to top two elements in values stack
                 while (!ops.empty() && hasPrecedence(tokens[i], ops.peek()))
+                {
                   values.push(applyOp2(ops,values));
- 
+                } 
                 // Push current token to 'ops'.
                 ops.push(tokens[i]);
             }
@@ -82,12 +87,17 @@ public class EvaluateString
     {
         if (op2 == '(' || op2 == ')')
             return false;
-        if ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-'|| 
-        		op2 == 's' || op2 == 'c' || op2 == 't' ||
-        		op2 == 'S' || op2 == 'C' || op2 == 'T'))
-            return false;
-        if(op2 == 's')
+        if ((op1 == 's' || op1 == 'c' || op1 == 't' ||
+    		op1 == 'S' || op1 == 'C' || op1 == 'T' || op1 == 'n') &&
+    		(op2 == '*' || op2 == '/' || op2 == '+' || op2 == '-'))
         	return false;
+        if ((op1 == 'd' || op1 == 'e' || op1 == 'f' ||
+    		op1 == 'g' || op1 == 'h' || op1 == 'i' ||
+    		op1 == 'j' || op1 == 'k' || op1 == 'l' || 
+    		op1 == 'm') && (op2 == '*' || op2 == '/' || op2 == '+' || op2 == '-'))
+        	return false;
+        if ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-'))
+        		return false;
         else
             return true;
     }
@@ -124,7 +134,9 @@ public class EvaluateString
         case '+':
             return values.pop() + values.pop();
         case '-':
-            return values.pop() - values.pop();
+        	double x = values.pop();
+        	double y = values.pop();
+            return y - x;
         case '*':
             return values.pop() * values.pop();
         case '/':
@@ -146,6 +158,34 @@ public class EvaluateString
         	return Math.acos(values.pop());
         case 'T':
         	return Math.atan(values.pop());
+        case 'n':
+        	return (-1 * values.pop());
+        case 'd':
+        	return Math.pow(values.pop(), 2);
+        case 'e':
+        	return Math.pow(values.pop(), 3);
+        case 'f':
+        	double c = values.pop();
+        	double d = values.pop();
+        	return Math.pow(d, c);
+        case 'g':
+        	return Math.sqrt(values.pop());
+        case 'h':
+        	return Math.cbrt(values.pop());
+        case 'i':
+        	return 1/(values.pop());
+        case 'j':
+        	return Math.pow(10,values.pop());
+        case 'k':
+        	return Math.log10(values.pop());
+        case 'l':
+        	return (Math.log(values.pop())) / (Math.log(2));
+        case 'm':
+        	double e = values.pop();
+        	double f = values.pop();
+        	return (f * Math.pow(10,e));
+        	
+        	
         }
         return 0;
     }
